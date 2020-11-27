@@ -1,6 +1,4 @@
 # alpine-chrome-with-node
-=========
-
 Dockerized headless chrome with node base image
 
 ## Features

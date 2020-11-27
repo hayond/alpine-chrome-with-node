@@ -1,4 +1,4 @@
-FROM node:lts-alpine
+FROM node:15.3.0-alpine
 
 ARG BUILD_DATE
 ARG VCS_REF

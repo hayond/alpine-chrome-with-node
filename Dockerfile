@@ -1,36 +1,14 @@
-ARG NODE_VERSION=lts
-FROM node:${NODE_VERSION}-alpine
+FROM node:lts-alpine
 
-# Installs latest Chromium package.
-RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" > /etc/apk/repositories \
-    && echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
-    && echo "http://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
-    && echo "http://dl-cdn.alpinelinux.org/alpine/v3.12/main" >> /etc/apk/repositories \
-    && apk upgrade -U -a \
-    && apk add \
-    libstdc++ \
-    chromium \
-    harfbuzz \
-    nss \
-    freetype \
-    ttf-freefont \
-    font-noto-emoji \
-    wqy-zenhei \
-    && rm -rf /var/cache/* \
-    && mkdir /var/cache/apk
+FROM zenika/alpine-chrome
 
-COPY local.conf /etc/fonts/local.conf
+COPY --from=0 /usr/local/bin/node /usr/local/bin/node
+COPY --from=0 /usr/local/lib /usr/local/lib
 
-# Add Chrome as a user
-RUN mkdir -p /usr/src/app \
-    && adduser -D chrome \
-    && chown -R chrome:chrome /usr/src/app
-# Run Chrome as non-privileged
+USER root
+RUN ln -s /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm
 USER chrome
-WORKDIR /usr/src/app
 
-ENV CHROME_BIN=/usr/bin/chromium-browser \
-    CHROME_PATH=/usr/lib/chromium/
+ENV APIFY_CHROME_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
-# Autorun chrome headless
-ENTRYPOINT ["chromium-browser", "--headless", "--use-gl=swiftshader", "--disable-software-rasterizer", "--disable-dev-shm-usage"]
+ENTRYPOINT ["chromium-browser", "--version"]
